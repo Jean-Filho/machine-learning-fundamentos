@@ -1,0 +1,90 @@
+import pandas as pd
+
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+
+# ======================================================
+# LENDO A BASE DE DADOS
+# ======================================================
+
+data = pd.read_csv("fruit_data_with_colors.txt", sep="\t")
+
+print("Primeiras linhas da base:")
+print(data.head())
+
+# ======================================================
+# SEPARANDO AS VARIÁVEIS
+# ======================================================
+
+X = data[["mass", "height", "width", "color_score"]]
+y = data["fruit_label"]
+
+# ======================================================
+# DIVIDINDO EM TREINO E TESTE
+# ======================================================
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.25,
+    random_state=42
+)
+
+# ======================================================
+# NORMALIZANDO OS DADOS
+# ======================================================
+
+scaler = MinMaxScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# ======================================================
+# CRIANDO O MODELO KNN
+# ======================================================
+
+knn = KNeighborsClassifier(n_neighbors=3)
+
+# Treinando
+knn.fit(X_train, y_train)
+
+# ======================================================
+# AVALIAÇÃO
+# ======================================================
+
+acuracia = knn.score(X_test, y_test)
+
+print("\nAcurácia:", acuracia)
+
+# ======================================================
+# PREVISÕES
+# ======================================================
+
+previsoes = knn.predict(X_test)
+
+print("\nPrevisões:")
+print(previsoes)
+
+print("\nValores reais:")
+print(y_test.values)
+
+# ======================================================
+# EXEMPLO DE UMA NOVA FRUTA
+# ======================================================
+
+nova_fruta = [[180, 7.5, 7.4, 0.85]]
+
+nova_fruta = scaler.transform(nova_fruta)
+
+resultado = knn.predict(nova_fruta)
+
+nomes = {
+    1: "Maçã",
+    2: "Mandarina",
+    3: "Laranja",
+    4: "Limão"
+}
+
+print("\nNova fruta prevista:")
+print(nomes[resultado[0]])
